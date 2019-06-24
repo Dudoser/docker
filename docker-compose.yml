@@ -1,0 +1,34 @@
+version: '2'
+
+services:
+    nginx:
+        image: nginx:latest
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - ./hosts:/etc/nginx/conf.d
+            - ./www:/var/www
+            - ./logs:/var/log/nginx
+        links:
+            - php
+    php:
+        build: ./images/php
+        links:
+            - mysql
+        volumes:
+            - ./www:/var/www
+    mysql:
+        image: mysql:8.0
+        container_name: mysql-server-80
+        command: --default-authentication-plugin=mysql_native_password
+        volumes:
+            - ./mysql:/application
+        restart: always
+        environment:
+            - MYSQL_ROOT_PASSWORD=root
+            - MYSQL_DATABASE=project
+            - MYSQL_USER=root
+            - MYSQL_PASSWORD=root
+        ports:
+            - "8082:3306"
